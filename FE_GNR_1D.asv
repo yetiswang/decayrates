@@ -295,10 +295,9 @@ decayrates.enei = enei;
 decayrates.sca = sca; 
 decayrates.Q_avg = Q_avg;
 decayrates.phi = phi; % continuous quantum yield from 0 to 1 for plotting
-decayrates.tot_mod = tot_mod; % lifetime reduction at fixed for all phi. Should be almost flat due to fixed location
-decayrates.QY_mod = QY_mod; % QY modifications for all phi. Should decrease with increasing phi. 
+decayrates.tot_mod = tot_mod; % lifetime reduction 
+decayrates.QY_mod = QY_mod;
 save decayrates decayrates
-%% Photon count rate calculation.
-[PCR] = PhotonCountRate( decayrates );
+
 
 end
