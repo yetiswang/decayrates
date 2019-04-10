@@ -223,6 +223,9 @@ saveas( gcf, 'nearfield_xyz.png' )
 %% Orientation averaging of emission enhancement, and calculation of position dependent total fluorescence enhancement. 
 rad_average = ( rad(:, 1) + rad(:, 2) + rad(:, 3) )./3 ;
 tot_average = ( tot(:, 1) + tot(:, 2) + tot(:, 3) )./3 ;
+enei_field = 637;
+enei_dipole = 670;
+QY = [ 0.01 0.02 0.05 0.1 0.2 0.5 1]; % series of QY for calculation
 
 for i = 1 : length(QY)
     

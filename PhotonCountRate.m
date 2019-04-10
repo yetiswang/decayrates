@@ -23,21 +23,22 @@ PCR.I_inc = logspace(0,11,50) ; % incident power density, W m^-2, 1 - 1e10 W m^-
 
 PCR.ISC_ratio = 1;
 
+PCR.I_sat = PCR.h*PCR.nu*PCR.k_tot*PCR.ISC_ratio./PCR.AbsorptionCrossSection  ;
 PCR.I_satenh = PCR.h*PCR.nu*PCR.k_tot.*decayrates.tot_average.*PCR.ISC_ratio./PCR.AbsorptionCrossSection  ; % distance-dependent term from tot_average, this is a local field term. Far-field values needs to be devided by near field enhancement factor.
 
-%% Plot quantum yield and distance dependent saturation curves
+%% Plot quantum yield and distance dependent saturation curves, at HIGH excitation power
 figure
 
 PCR.I_exc = PCR.I_inc(end) ; % w m^-2
-PCR.I_sat = PCR.h*PCR.nu*PCR.k_tot*PCR.ISC_ratio./PCR.AbsorptionCrossSection  ;
+
 for i = 1 : length(decayrates.QY)
     
-    PCR.EnhCountRateDistQYdepend(i,:)  = PCR.AbsorptionCrossSection.* PCR.collectionEfficiency./...
+    PCR.EnhCountRateDistQYdepend_HI(i,:)  = PCR.AbsorptionCrossSection.* PCR.collectionEfficiency./...
         (PCR.h*PCR.nu).*decayrates.QY(i).* decayrates.Q_avg(i,:)'./decayrates.QY(i).*PCR.I_exc.*PCR.I_satenh.*decayrates.ee./(PCR.I_exc.*decayrates.ee + PCR.I_satenh);% enhanced PCR count rate, distance dependent
-    PCR.NonenhCountRateDistQYdepend(i)  = PCR.AbsorptionCrossSection.* PCR.collectionEfficiency....
+    PCR.NonenhCountRateDistQYdepend_HI(i)  = PCR.AbsorptionCrossSection.* PCR.collectionEfficiency....
         /(PCR.h*PCR.nu).*decayrates.QY(i).*PCR.I_exc.*PCR.I_sat./(PCR.I_exc + PCR.I_sat);% non-enhanced PCR count rate, non-distance dependent, fixed power
-    plot( decayrates.d_BEM, PCR.EnhCountRateDistQYdepend(i,:))
-    hline(PCR.NonenhCountRateDistQYdepend(i),':')
+    plot( decayrates.d_BEM, PCR.EnhCountRateDistQYdepend_HI(i,:))
+    hline(PCR.NonenhCountRateDistQYdepend_HI(i),':')
     
     hold on
 end
@@ -48,8 +49,36 @@ title(['Laser power: ', num2str(PCR.I_exc,' %1.0e'),' W m^{-2}'])
 MinWhitSpace
 hold off
 
-saveas( gcf,'Distance QY dependent Photon_rates.fig' )
-saveas( gcf,'Distance QY dependent Photon_rates.png' )
+saveas( gcf,'Distance QY dependent Photon_rates_HIGH_exc.fig' )
+saveas( gcf,'Distance QY dependent Photon_rates_HIGH_exc.png' )
+
+
+%% Plot quantum yield and distance dependent saturation curves, at LOW excitation power
+figure
+
+PCR.I_exc = PCR.I_sat ; % w m^-2
+
+for i = 1 : length(decayrates.QY)
+    
+    PCR.EnhCountRateDistQYdepend_LO(i,:)  = PCR.AbsorptionCrossSection.* PCR.collectionEfficiency./...
+        (PCR.h*PCR.nu).*decayrates.QY(i).* decayrates.Q_avg(i,:)'./decayrates.QY(i).*PCR.I_exc.*PCR.I_satenh.*decayrates.ee./(PCR.I_exc.*decayrates.ee + PCR.I_satenh);% enhanced PCR count rate, distance dependent
+    PCR.NonenhCountRateDistQYdepend_LO(i)  = PCR.AbsorptionCrossSection.* PCR.collectionEfficiency....
+        /(PCR.h*PCR.nu).*decayrates.QY(i).*PCR.I_exc.*PCR.I_sat./(PCR.I_exc + PCR.I_sat);% non-enhanced PCR count rate, non-distance dependent, fixed power
+    plot( decayrates.d_BEM, PCR.EnhCountRateDistQYdepend_LO(i,:))
+    hline(PCR.NonenhCountRateDistQYdepend_LO(i),':')
+    
+    hold on
+end
+xlabel('d (nm)')
+ylabel('Photon count rate (s^{-1})')
+set(gca,'YScale','log')
+title(['Laser power: ', num2str(PCR.I_exc,' %1.0e'),' W m^{-2}'])
+MinWhitSpace
+hold off
+
+saveas( gcf,'Distance QY dependent Photon_rates_LOW_exc.fig' )
+saveas( gcf,'Distance QY dependent Photon_rates_LOW_exc.png' )
+
 
 %% Plot quantum yield and power dependent saturation curves at the optimal position (fixed at 3 nm)
 
