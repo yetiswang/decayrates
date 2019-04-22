@@ -9,7 +9,7 @@
 %       Output:   sca: scattering spectrum with the same length as enei,
 %                 fit: fitted lorentz curve, same length as enei,
 %                 Lorentz: four Lorentz parameters
-function [ sca, fit, Lorentz ] = spect_GNR_BEM( epstab, height, diameter, enei, ztab )
+function [ sca, fit, Lorentz, p] = spect_GNR_BEM( epstab, height, diameter, enei, ztab )
 
 if nargin == 5
     ztab = 0 ;
