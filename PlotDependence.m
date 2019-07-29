@@ -5,29 +5,32 @@ directories = dir();
 dirFlags = [directories.isdir];
 subFolders = directories(dirFlags);
 
-for i = 3 : 14
+pcles = length(subFolders) - 2; 
+
+for i = 3 : length(subFolders)
     cd(subFolders(i).name)
     load PCR
+    load decayrates
     NonenhDistDepend_HI{i - 2} = PCR.NonenhCountRateDistQYdepend_HI;
     EnhDistDepend_HI{i -2} = PCR.EnhCountRateDistQYdepend_HI;
     NonenhDistDepend_LO{i - 2} = PCR.NonenhCountRateDistQYdepend_LO;
     EnhDistDepend_LO{i -2} = PCR.EnhCountRateDistQYdepend_LO;
     NonenhPowerQYDepend{i - 2} = PCR.NonenhCountRatePowerQYdepend;
     EnhPowerQYDepend{i - 2} = PCR.EnhCountRatePowerQYdepend;
+    WL(i - 2) = 1248/decayrates.Lorentz(3);
     cd ..
 end 
 
 %% Plot SPR dependent, power dependent, QY = 0.5
 figure
 x = PCR.I_inc ;
-for i = 1 : 12
+for i = 1 : pcles
     plot(x, EnhPowerQYDepend{i}(6,:))
     hold on 
 end 
 plot(x, PCR.NonenhCountRatePowerQYdepend(6,:),':')
 xlabel('Power Wm^{-2}')
 ylabel('Photon count rate')
-load WL
 lg = split(num2str(round(WL)),'  ');
 lg{end + 1} = 'Non-enhanced';
 legend( lg )
@@ -38,7 +41,7 @@ saveas( gcf,'AbsPCR_power_depend.png' )
 figure
 idx = [36, 41,43, 46, 48, 50];
 power = PCR.I_inc(idx);
-for i = 1 : 12
+for i = 1 : pcles
     for j = 1 : length(power)
         enhpqydepend(i,j) = EnhPowerQYDepend{i}(6,idx(j));
     end
@@ -56,12 +59,22 @@ ylabel('Photon count rate')
 saveas( gcf,'AbsPCR_SPR_depend.fig' )
 saveas( gcf,'AbsPCR_SPR_depend.png' )
 
+%% Plot SPR dependent brightness enhancement, QY = 0.5
+figure
+plot(WL,enhpqydepend(:,6)./NonenhPowerQYDepend{1,1}(6,end),'o-')
+xlabel( 'SPR wavelength (nm)' )
+ylabel('Brightness enhancement')
+
+saveas( gcf,'SPR_vs_Brightness_enh.fig' )
+saveas( gcf,'SPR_vs_Brightness_enh.png' )
+
+
 %% Plot SPR dependent, at fixed powers, QY = 1
 
 figure
 idx = [36, 41,43, 46, 48, 50];
 power = PCR.I_inc(idx);
-for i = 1 : 12
+for i = 1 : pcles
     for j = 1 : length(power)
         enhpqydepend(i,j) = EnhPowerQYDepend{i}(7,idx(j));
     end
@@ -79,17 +92,31 @@ ylabel('Photon count rate')
 saveas( gcf,'AbsPCR_SPR_depend.fig' )
 saveas( gcf,'AbsPCR_SPR_depend.png' )
 
+% plot SPR of maximum enhancement as a function power
+figure
+[maxi, id_max_1 ] = max( enhpqydepend(:,1) );
+[maxi, id_max_2 ] = max( enhpqydepend(:,2) );
+[maxi, id_max_3 ] = max( enhpqydepend(:,3) );
+[maxi, id_max_4 ] = max( enhpqydepend(:,4) );
+[maxi, id_max_5 ] = max( enhpqydepend(:,5) );
+[maxi, id_max_6 ] = max( enhpqydepend(:,6) );
+id_max = [WL(id_max_1),WL(id_max_2),WL(id_max_3),WL(id_max_4),WL(id_max_5),WL(id_max_6)];
+plot(PCR.I_inc(idx), id_max )
+
+save id_max id_max
+save idx idx
+
 %% Plot SPR and distance dependent SPR. Distance = 1, 3, 10, 30, 100. 
 
 idx_d = [ 3, 10, 35, 90, 200 ];
 
 figure
-for i = 1 : 12
-    loglog(d_BEM, EnhDistDepend_HI{i}(6,:))
+for i = 1 : pcles
+    loglog(decayrates.d_BEM, EnhDistDepend_HI{i}(7,:))
     hold on 
 end 
 legend(lg)
-hline(NonenhDistDepend_HI{1,6}(6),'r:','Non-enhanced' )
+hline(NonenhDistDepend_HI{1,7}(7),'r:','Non-enhanced' )
 xlabel( 'd (nm)' )
 ylabel('Photon count rate')
 
@@ -102,14 +129,15 @@ saveas( gcf,'Distance_depend.png' )
 % At high power
 
 figure
-for i = 1 : 12
+for i = 1 : pcles
     z(i,:) = EnhDistDepend_HI{i}(6,:);
 end 
     
     
-imagesc( WL, d_BEM, z');
+imagesc( WL, decayrates.d_BEM, z');
 colorbar
 colormap jet
+set(gca,'ColorScale','log')
 xlabel('SPR wavelength (nm)')
 ylabel('molecule-particle separation d (nm)')
 zlabel('Photon s^{-1}')
@@ -120,14 +148,15 @@ saveas(gcf,'SPR-d-PCR correlation HIGH exc.png')
 % At low power
 
 figure
-for i = 1 : 12
+for i = 1 : pcles
     z(i,:) = EnhDistDepend_LO{i}(6,:);
 end 
     
     
-imagesc( WL, d_BEM, z');
+imagesc( WL, decayrates.d_BEM, z');
 colorbar
 colormap jet
+set(gca,'ColorScale','log')
 xlabel('SPR wavelength (nm)')
 ylabel('molecule-particle separation d (nm)')
 zlabel('Photon s^{-1}')
@@ -135,3 +164,19 @@ zlabel('Photon s^{-1}')
 saveas(gcf,'SPR-d-PCR correlation LOW exc.fig')
 saveas(gcf,'SPR-d-PCR correlation LOW exc.png')
 
+%% Plot distance-dependent brightness enhancement, at HIGH power
+figure
+for i = 1 : pcles
+    z(i,:) = EnhDistDepend_HI{i}(6,:)./NonenhPowerQYDepend{1,1}(6,end);
+end 
+
+imagesc( WL, decayrates.d_BEM, z');
+colorbar
+colormap jet
+set(gca,'ColorScale','log')
+xlabel('SPR wavelength (nm)')
+ylabel('molecule-particle separation d (nm)')
+zlabel('Brightness enhancement')
+
+saveas(gcf,'SPR-d-PCR correlation enhancement HIGH exc.fig')
+saveas(gcf,'SPR-d-PCR correlation enhancement HIGH exc.png')
