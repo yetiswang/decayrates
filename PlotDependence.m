@@ -17,27 +17,41 @@ for i = 3 : length(subFolders)
     EnhDistDepend_LO{i -2} = PCR.EnhCountRateDistQYdepend_LO;
     NonenhPowerQYDepend{i - 2} = PCR.NonenhCountRatePowerQYdepend;
     EnhPowerQYDepend{i - 2} = PCR.EnhCountRatePowerQYdepend;
+    I_satenh(i - 2) = PCR.I_satenh(11)./decayrates.ee(11);
+    maxPCRenh (i - 2) = PCR.maxPCRenh(6);
+    maxPCRenhfactor(i - 2) = PCR.maximumPCRenhancement(6); 
     WL(i - 2) = 1248/decayrates.Lorentz(3);
     cd ..
 end 
 
-%% Plot SPR dependent, power dependent, QY = 0.5
+%% Plot SPR dependent, power dependent, QY = 0.05
 figure
 x = PCR.I_inc ;
-for i = 1 : pcles
-    plot(x, EnhPowerQYDepend{i}(6,:))
+pcles_id = [ 3, 6, 9, 11];
+for i = 1 : length(pcles_id)
+    loglog(x, EnhPowerQYDepend{pcles_id(i)}(6,:))
+    %vline(I_satenh(pcles_id(i)))
+    %hline(maxPCRenh(pcles_id(i)))
     hold on 
-end 
-plot(x, PCR.NonenhCountRatePowerQYdepend(6,:),':')
+end
+nonenh_PCR = PCR.NonenhCountRatePowerQYdepend(6,:) ;
+loglog(x, nonenh_PCR,'-')
+%vline(PCR.I_sat)
+%hline(PCR.maxPCR(6))
 xlabel('Power Wm^{-2}')
 ylabel('Photon count rate')
-lg = split(num2str(round(WL)),'  ');
+lg = split(num2str(round(WL(pcles_id))),'  ');
+for i = 1 : length(lg)
+    lg{i} = [lg{i},' nm'];
+end 
 lg{end + 1} = 'Non-enhanced';
 legend( lg )
 MinWhitSpace
 saveas( gcf,'AbsPCR_power_depend.fig' )
 saveas( gcf,'AbsPCR_power_depend.png' )
-%% Plot SPR dependent, at fixed powers, QY = 0.5
+save incidentpowerdensity x 
+save nonenh_PCR_QY0.5.mat nonenh_PCR
+%% Plot SPR dependent, at fixed powers, QY = 0.05
 figure
 idx = [36, 41,43, 46, 48, 50];
 power = PCR.I_inc(idx);
@@ -59,12 +73,13 @@ ylabel('Photon count rate')
 saveas( gcf,'AbsPCR_SPR_depend.fig' )
 saveas( gcf,'AbsPCR_SPR_depend.png' )
 
-%% Plot SPR dependent brightness enhancement, QY = 0.5
+%% Plot SPR dependent brightness enhancement, QY = 0.05
 figure
-plot(WL,enhpqydepend(:,6)./NonenhPowerQYDepend{1,1}(6,end),'o-')
+plot(WL,maxPCRenhfactor,'o-')
 xlabel( 'SPR wavelength (nm)' )
 ylabel('Brightness enhancement')
-
+save WL WL
+save maxPCRenhfactor maxPCRenhfactor
 saveas( gcf,'SPR_vs_Brightness_enh.fig' )
 saveas( gcf,'SPR_vs_Brightness_enh.png' )
 

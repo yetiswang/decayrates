@@ -16,8 +16,17 @@ function [PCR] = PhotonCountRate( decayrates )
     %default lifetime of the dipole
     %lifetime = 1e-8; % seconds
     %PCR.lifetime = 3.5e-9 ;% ATTO 647N
-    PCR.lifetime = 1e-9 ;% Cy5
+    %PCR.lifetime = 2.8e-10 ;% ATTO 647N, 13 times quenching, QY = 0.05
+    %PCR.lifetime = 1e-9 ;% Cy5
+    PCR.lifetime = 0.1e-9; % Crystal violet, 100 ps ;
+    %PCR.k_tot = 2.8e8; % no quenching
+    %PCR.k_tot = 3.6e9; % 13 times quenching
     PCR.k_tot = 1/PCR.lifetime;
+    
+    %PCR.k_r = 1.8e8; % decayrates.QY*PCR.k_tot; % no quenching
+    %PCR.k_nr = 1.9e8; % CR.k_tot - PCR.k_r; % no quenching
+    %PCR.k_nr = 3.4e9; % 13 times quenching, QY = 0.05.
+    % set quenching by increasing the non-radiative rate. 
     %I_e = 1e-5; % Watt
     %I_inc = I_e ./( h*c/(enei_field*1e-9) * pi * ( 0.425 *(enei_field*1e-9)/NA )^2 ) *1e-18; % confocal photon density, photons nm-2 s-1
     
@@ -33,8 +42,8 @@ function [PCR] = PhotonCountRate( decayrates )
     
     PCR.I_exc = PCR.I_inc(end) ; % w m^-2
     
-    for i = 1 : length(decayrates.QY)
-        
+    %for i = 1 : length(decayrates.QY(6))
+    for i = 2   
         PCR.EnhCountRateDistQYdepend_HI(i,:)  = PCR.AbsorptionCrossSection.* PCR.collectionEfficiency./...
             (PCR.h*PCR.nu).*decayrates.QY(i).* decayrates.Q_avg(i,:)'./decayrates.QY(i).*PCR.I_exc.*PCR.I_satenh.*decayrates.ee./(PCR.I_exc.*decayrates.ee + PCR.I_satenh);% enhanced PCR count rate, distance dependent
         PCR.NonenhCountRateDistQYdepend_HI(i)  = PCR.AbsorptionCrossSection.* PCR.collectionEfficiency....
@@ -60,8 +69,8 @@ function [PCR] = PhotonCountRate( decayrates )
     
     PCR.I_exc = PCR.I_sat ; % w m^-2
     
-    for i = 1 : length(decayrates.QY)
-        
+    %for i = 1 : length(decayrates.QY(6))
+     for i = 2   
         PCR.EnhCountRateDistQYdepend_LO(i,:)  = PCR.AbsorptionCrossSection.* PCR.collectionEfficiency./...
             (PCR.h*PCR.nu).*decayrates.QY(i).* decayrates.Q_avg(i,:)'./decayrates.QY(i).*PCR.I_exc.*PCR.I_satenh.*decayrates.ee./(PCR.I_exc.*decayrates.ee + PCR.I_satenh);% enhanced PCR count rate, distance dependent
         PCR.NonenhCountRateDistQYdepend_LO(i)  = PCR.AbsorptionCrossSection.* PCR.collectionEfficiency....
@@ -84,7 +93,8 @@ function [PCR] = PhotonCountRate( decayrates )
     
     %% Plot quantum yield and power dependent saturation curves at the optimal position (fixed at 3 nm)
     
-    for i = 1 : length (decayrates.QY)
+    %for i = 1 : length (decayrates.QY)
+    for i = 2
         %PCR.I_sat = PCR.h*PCR.nu*PCR.k_tot./PCR.AbsorptionCrossSection  ; % non-enhanced I_sat
         PCR.NonenhCountRatePowerQYdepend(i,:)  =  PCR.AbsorptionCrossSection.* PCR.collectionEfficiency./(PCR.h*PCR.nu).*decayrates.QY(i).*PCR.I_inc.*PCR.I_sat./(PCR.I_inc + PCR.I_sat);% non-enhanced PCR count rate, non-distance dependent, power-dependent PCR
         
@@ -122,14 +132,14 @@ function [PCR] = PhotonCountRate( decayrates )
         
     end
     %%
-    figure
-    loglog(decayrates.QY,PCR.maximumPCRenhancement,'ro-',decayrates.phi, decayrates.QY_mod, 'b-', decayrates.phi, decayrates.tot_mod, 'g-')
-    xlabel('\Phi_0')
-    ylabel('PCR^*_{max}/PCR_{max}')
-    legend('Maximal PCR enhancement','QY modification','lifetime modification')
-    MinWhitSpace
-    saveas( gcf,'QY dependent PCR max enhancement.fig' )
-    saveas( gcf,'QY dependent PCR max enhancement.png' )
+%     figure
+%     loglog(decayrates.QY,PCR.maximumPCRenhancement,'ro-',decayrates.phi, decayrates.QY_mod, 'b-', decayrates.phi, decayrates.tot_mod, 'g-')
+%     xlabel('\Phi_0')
+%     ylabel('PCR^*_{max}/PCR_{max}')
+%     legend('Maximal PCR enhancement','QY modification','lifetime modification')
+%     MinWhitSpace
+%     saveas( gcf,'QY dependent PCR max enhancement.fig' )
+%     saveas( gcf,'QY dependent PCR max enhancement.png' )
     
     %% Plot the ratio of lifetime reduction and near field enhancement as a distance dependent curve
     
