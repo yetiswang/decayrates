@@ -47,11 +47,11 @@ function [PCR, FE, Lorentz, ee] = FE_GNR_1D( height, diameter, metal, enei_field
     directory = pwd;
     switch metal
         case 'Au'
-            ndir = ['H',num2str(height),'D',num2str(diameter),'_GNR_distance_dependent_FE','_Exc', num2str(enei_field),'_Dip_',num2str(enei_dipole)];
+            ndir = ['H',num2str(height),'D',num2str(diameter),'_GNR','_Exc', num2str(enei_field),'_Dip_',num2str(enei_dipole)];
         case 'AgPalik'
-            ndir = ['H',num2str(height),'D',num2str(diameter),'_AgNR_palik_distance_dependent_FE','_Exc', num2str(enei_field),'_Dip_',num2str(enei_dipole)];
+            ndir = ['H',num2str(height),'D',num2str(diameter),'_AgNR_palik','_Exc', num2str(enei_field),'_Dip_',num2str(enei_dipole)];
         case 'AgJC'
-            ndir = ['H',num2str(height),'D',num2str(diameter),'_AgNR_JC_distance_dependent_FE','_Exc', num2str(enei_field),'_Dip_',num2str(enei_dipole)];
+            ndir = ['H',num2str(height),'D',num2str(diameter),'_AgNR_JC','_Exc', num2str(enei_field),'_Dip_',num2str(enei_dipole)];
     end
     mkdir(ndir)
     cd(ndir)
