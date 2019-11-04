@@ -28,7 +28,7 @@ function [PCR, FE, Lorentz, ee] = FE_GNR_1D( height, diameter, metal, enei_field
     %  nanorod geometries
     mesh = [ 41, 41, 41]; % n1 for the circumference of the rod, n2 for the polar angles of the rod caps, n3 for the cylinder-shaped middle part of the rod
     
-    QY = [ 0.01 0.02 0.05 0.1 0.2 0.5 1]; % series of QY for calculation
+    QY = [ 0.01 0.02 0.05 0.1 0.2 0.65 1]; % series of QY for calculation
     
     
     %  nanosphere with finer discretization at the top
@@ -59,7 +59,7 @@ function [PCR, FE, Lorentz, ee] = FE_GNR_1D( height, diameter, metal, enei_field
     %% Calculate and save the scattering spectrum for reference
     enei = linspace(500,1000,50 );
     
-    [ sca, ~, Lorentz ] = spect_GNR_BEM( epstab, height, diameter, enei);
+    [ sca, ~, ~, Lorentz, ~ ] = spect_GNR_BEM( epstab, height, diameter, enei);
     
     %%  set wavelength of planewave and dipole oscillator
     if nargin == 3
@@ -227,7 +227,7 @@ function [PCR, FE, Lorentz, ee] = FE_GNR_1D( height, diameter, metal, enei_field
     tot_average = ( tot(:, 1) + tot(:, 2) + tot(:, 3) )./3 ;
     enei_field = 637;
     enei_dipole = 670;
-    QY = [ 0.01 0.02 0.05 0.1 0.2 0.5 1]; % series of QY for calculation
+    %QY = [ 0.01 0.02 0.05 0.1 0.2 0.65 1]; % series of QY for calculation
     
     for i = 1 : length(QY)
         

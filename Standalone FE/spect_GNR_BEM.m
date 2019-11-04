@@ -109,5 +109,5 @@ end
 multiWaitbar( 'CloseAll' );
 
 %% LORENTZIAN FIT
-[ fit, Lorentz ] = LorentzFitYW( sca, enei, ndir, 'sca') ;
+[ fit, Lorentz, ~ ] = LorentzFitYW( sca, enei, ndir, 'sca') ;
 %[ fit_abs, Lorentz_abs ] = LorentzFitYW( abs, enei, ndir, 'abs', 'Yes' ) ;
