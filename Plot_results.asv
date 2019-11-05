@@ -23,7 +23,8 @@ for i = 3 : length(subFolders)
     EnhDistDepend_LO{i -2} = PCR.EnhCountRateDistQYdepend_LO;
     NonenhPowerQYDepend{i - 2} = PCR.NonenhCountRatePowerQYdepend;
     EnhPowerQYDepend{i - 2} = PCR.EnhCountRatePowerQYdepend;
-    I_satenh(i - 2) = PCR.I_satenh(dist_idx)./decayrates.ee(dist_idx);% index 11, at 3 nm. 
+    I_satenh(i - 2, :) = PCR.I_satenh;% index 11, at 3 nm. 
+    I_satenhFF(i - 2, :) = PCR.I_satenh./decayrates.ee; 
     maxPCRenh (i - 2) = PCR.maxPCRenh(QY_idx); % index 6, at quantum yield 0.65, index 2, at quantum yield of 0.02
     maxPCRenhfactor(i - 2) = PCR.maximumPCRenhancement(QY_idx); % index 6, at quantum yield 0.65 ,index 2, at quantum yield of 0.02
     WL(i - 2) = 1248/decayrates.Lorentz(3);
@@ -33,6 +34,9 @@ for i = 3 : length(subFolders)
     height(i - 2) = str2num(subFolders(i).name(2:endIndex-1));
      [startIndex,endIndex] = regexp( subFolders(i).name,'D[0-9]\w');
     diameter(i - 2) = str2num(subFolders(i).name(startIndex+1:endIndex));
+    tot_average(:, i - 2) = decayrates.tot_average; 
+    rad_average(:, i - 2) = decayrates.rad_average;
+    Q_avg(i - 2 , : ) = decayrates.Q_avg(QY_idx,:); 
     cd ..
 end 
 
@@ -65,9 +69,34 @@ saveas( gcf,'AbsPCR_power_depend.fig' )
 saveas( gcf,'AbsPCR_power_depend.png' )
 save incidentpowerdensity x 
 save nonenh_PCR_QY0.65.mat nonenh_PCR
-%% Plot diameter dependent enhancement
-scatter(sordiameter,maxPCRenhfactor)
+%% Plot diameter dependent enhancement. Calculate and plot distance dependent for all sizes of particles as well. 
+figure;scatter(diameter,maxPCRenhfactor)
+figure;scatter(diameter,I_satenh(:,dist_idx))
+figure;scatter(diameter,maxFE)
 
+k_tot = PCR.k_r./decayrates.QY(QY_idx); % intrinsic total decay rate. This is the same for every particle
+phi_0 = decayrates.QY(QY_idx); 
+
+for i = 1 : length(diameter)
+    
+    I_sat(i) = PCR.h*PCR.nu*k_tot./(PCR.AbsorptionCrossSection.*(1 + PCR.ISC_ratio))  ;
+    
+    PCR_max(i,:) = PCR.AbsorptionCrossSection.* PCR.collectionEfficiency./...
+        (PCR.h*PCR.nu).*Q_avg(i,:).*I_satenh(i,:); % enhanced maximal PCR
+    PCR_maxnonenh(i) = PCR.AbsorptionCrossSection.* PCR.collectionEfficiency./...
+        (PCR.h*PCR.nu).*phi_0.* I_sat(i);  % non-enhanced maximal PCR
+end
+
+[diameter, sortIdx] = sort(diameter, 'ascend');
+PCR_maxsort = PCR_max(sortIdx,:);
+I_satenhsort = I_satenh(sortIdx,:);
+Q_avgsort = Q_avg(sortIdx,:); 
+tot_averagesort = tot_average(:,sortIdx); 
+I_satenhFFsort = I_satenhFF(sortIdx,:); 
+figure;contourf(decayrates.d_BEM, diameter , PCR_maxsort)
+figure;contourf(decayrates.d_BEM, diameter , I_satenhsort)
+figure;contourf(decayrates.d_BEM, diameter , Q_avgsort)
+figure;contourf(decayrates.d_BEM, diameter, tot_averagesort')
 %% Plot enhanced I_sat and non-enhanced I_sat
 figure
 plot(abs(WL),I_satenh./PCR.I_sat)
