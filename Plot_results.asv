@@ -65,8 +65,8 @@ saveas( gcf,'AbsPCR_power_depend.fig' )
 saveas( gcf,'AbsPCR_power_depend.png' )
 save incidentpowerdensity x 
 save nonenh_PCR_QY0.65.mat nonenh_PCR
-%% Plot diameter dependent enhancement. 
-scatter(diameter,maxPCRenhfactor)
+%% Plot diameter dependent enhancement
+scatter(sordiameter,maxPCRenhfactor)
 
 %% Plot enhanced I_sat and non-enhanced I_sat
 figure
