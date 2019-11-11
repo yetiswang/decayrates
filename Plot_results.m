@@ -93,12 +93,85 @@ PCR_maxsort = PCR_max(sortIdx,:);
 I_satenhsort = I_satenh(sortIdx,:);
 Q_avgsort = Q_avg(sortIdx,:); 
 tot_averagesort = tot_average(:,sortIdx); 
+rad_averagesort = rad_average(:,sortIdx);
 I_satenhFFsort = I_satenhFF(sortIdx,:); 
-figure;contourf(decayrates.d_BEM, diameter , PCR_maxsort)
-figure;contourf(decayrates.d_BEM, diameter , I_satenhsort)
-figure;contourf(decayrates.d_BEM, diameter , Q_avgsort)
-figure;contourf(decayrates.d_BEM, diameter, tot_averagesort')
-figure;contourf(decayrates.d_BEM, diameter, I_satenhFFsort)
+figure;contourf(decayrates.d_BEM, diameter , PCR_maxsort, 1000, 'edgecolor', 'none')
+colormap jet
+colorbar
+xlabel('molecule-tip separation d (nm)')
+ylabel('diameter (nm)')
+legend('PCR_{max} (photons s^{-1})')
+set(gca,'colorscale', 'log', 'xscale', 'log')
+set(gca,'FontSize',10)
+pbaspect([1.2, 1 , 1])
+%gca.PlotBoxAspectRatio = [1 0.75 0.75];
+%set(gcf,'units','centimeters','position',[10,10,14,10])
+set(gca,'units','centimeters','position',[3,3,7,5])
+
+figure;contourf(decayrates.d_BEM, diameter , I_satenhsort,1000, 'edgecolor', 'none')
+colormap jet
+colorbar
+xlabel('molecule-tip separation d (nm)')
+ylabel('diamter (nm)')
+legend('I_{sat} (W m^{-2})')
+set(gca,'colorscale', 'log', 'xscale', 'log')
+set(gca,'FontSize',10)
+pbaspect([1.2, 1 , 1])
+%gca.PlotBoxAspectRatio = [1 0.75 0.75];
+%set(gcf,'units','centimeters','position',[10,10,14,10])
+set(gca,'units','centimeters','position',[3,3,7,5])
+
+figure;contourf(decayrates.d_BEM, diameter , Q_avgsort,1000, 'edgecolor', 'none')
+colormap jet
+colorbar
+xlabel('molecule-tip separation d (nm)')
+ylabel('diamter (nm)')
+legend('\phi')
+set(gca,'colorscale', 'log', 'xscale', 'log')
+set(gca,'FontSize',10)
+pbaspect([1.2, 1 , 1])
+%gca.PlotBoxAspectRatio = [1 0.75 0.75];
+%set(gcf,'units','centimeters','position',[10,10,14,10])
+set(gca,'units','centimeters','position',[3,3,7,5])
+
+figure;contourf(decayrates.d_BEM, diameter, tot_averagesort',1000, 'edgecolor', 'none')
+xlabel('molecule-tip separation d (nm)')
+ylabel('diamter (nm)')
+legend('\gamma_{tot}/\gamma_r^*')
+colormap jet
+colorbar
+set(gca,'colorscale', 'log', 'xscale', 'log')
+set(gca,'FontSize',10)
+pbaspect([1.2, 1 , 1])
+%gca.PlotBoxAspectRatio = [1 0.75 0.75];
+%set(gcf,'units','centimeters','position',[10,10,14,10])
+set(gca,'units','centimeters','position',[3,3,7,5])
+
+figure;contourf(decayrates.d_BEM, diameter , rad_averagesort',1000, 'edgecolor', 'none')
+xlabel('molecule-tip separation d (nm)')
+ylabel('diamter (nm)')
+legend('\gamma_{rad}/\gamma_r^*')
+colormap jet
+colorbar
+set(gca,'colorscale', 'log', 'xscale', 'log')
+set(gca,'FontSize',10)
+pbaspect([1.2, 1 , 1])
+%gca.PlotBoxAspectRatio = [1 0.75 0.75];
+%set(gcf,'units','centimeters','position',[10,10,14,10])
+set(gca,'units','centimeters','position',[3,3,7,5])
+
+figure;contourf(decayrates.d_BEM, diameter, I_satenhFFsort,1000, 'edgecolor', 'none')
+xlabel('molecule-tip separation d (nm)')
+ylabel('diamter (nm)')
+legend('I_{sat} (W m^{-2})')
+colormap jet
+colorbar
+set(gca,'colorscale', 'log', 'xscale', 'log')
+set(gca,'FontSize',10)
+pbaspect([1.2, 1 , 1])
+%gca.PlotBoxAspectRatio = [1 0.75 0.75];
+%set(gcf,'units','centimeters','position',[10,10,14,10])
+set(gca,'units','centimeters','position',[3,3,7,5])
 %% Plot enhanced I_sat and non-enhanced I_sat
 figure
 plot(abs(WL),I_satenh./PCR.I_sat)

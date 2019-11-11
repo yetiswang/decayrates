@@ -183,6 +183,19 @@ function [PCR] = PhotonCountRate( decayrates )
     figure
     loglog(phi_0,I_satenh(:,dist_idx), phi_0, I_sat, phi_0, I_satenh(:,dist_idx)./decayrates.ee(dist_idx) )
     
+    figure;contourf(decayrates.d_BEM, diameter, I_satenhFFsort,1000, 'edgecolor', 'none')
+    xlabel('molecule-tip separation d (nm)')
+    ylabel('\phi_0')
+    legend('I_{sat} (W m^{-2})')
+    colormap jet
+    colorbar
+    set(gca,'colorscale', 'log', 'xscale', 'log')
+    set(gca,'FontSize',10)
+    pbaspect([1.2, 1 , 1])
+    %gca.PlotBoxAspectRatio = [1 0.75 0.75];
+    %set(gcf,'units','centimeters','position',[10,10,14,10])
+    set(gca,'units','centimeters','position',[3,3,7,5])
+    
     % plot distance and phi_0 dependent phi
     figure
     [C,h] = contourf(decayrates.d_BEM,phi_0,phi);

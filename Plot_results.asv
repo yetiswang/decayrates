@@ -59,6 +59,7 @@ loglog(x, nonenh_PCR,'-')
 xlabel('Power Wm^{-2}')
 ylabel('Photon count rate')
 lg = split(num2str(round(WL(pcles_id))),'  ');
+lg = split(num2str(round(diameter)),'  ');
 for i = 1 : length(lg)
     lg{i} = [lg{i},' nm'];
 end 
@@ -92,11 +93,49 @@ PCR_maxsort = PCR_max(sortIdx,:);
 I_satenhsort = I_satenh(sortIdx,:);
 Q_avgsort = Q_avg(sortIdx,:); 
 tot_averagesort = tot_average(:,sortIdx); 
+rad_averagesort = rad_average(:,sortIdx);
 I_satenhFFsort = I_satenhFF(sortIdx,:); 
-figure;contourf(decayrates.d_BEM, diameter , PCR_maxsort)
-figure;contourf(decayrates.d_BEM, diameter , I_satenhsort)
-figure;contourf(decayrates.d_BEM, diameter , Q_avgsort)
-figure;contourf(decayrates.d_BEM, diameter, tot_averagesort')
+figure;contourf(decayrates.d_BEM, diameter , PCR_maxsort, 1000, 'edgecolor', 'none')
+colormap jet
+colorbar
+xlabel('molecule-tip separation d (nm)')
+ylabel('diameter (nm)')
+legend('PCR_{max} (photons s^{-1})')
+set(gca,'colorscale', 'log', 'xscale', 'log')
+figure;contourf(decayrates.d_BEM, diameter , I_satenhsort,1000, 'edgecolor', 'none')
+colormap jet
+colorbar
+xlabel('molecule-tip separation d (nm)')
+ylabel('diamter (nm)')
+legend('I_{sat} (W m^{-2})')
+set(gca,'colorscale', 'log', 'xscale', 'log')
+figure;contourf(decayrates.d_BEM, diameter , Q_avgsort,1000, 'edgecolor', 'none')
+colormap jet
+colorbar
+xlabel('molecule-tip separation d (nm)')
+ylabel('diamter (nm)')
+legend('\phi')
+set(gca,'colorscale', 'log', 'xscale', 'log')
+figure;contourf(decayrates.d_BEM, diameter, tot_averagesort',1000, 'edgecolor', 'none')
+xlabel('molecule-tip separation d (nm)')
+ylabel('diamter (nm)')
+legend('\gamma_{tot}/\gamma_r^*')
+colormap jet
+colorbar
+figure;contourf(decayrates.d_BEM, diameter , rad_averagesort',1000, 'edgecolor', 'none')
+xlabel('molecule-tip separation d (nm)')
+ylabel('diamter (nm)')
+legend('\gamma_{rad}/\gamma_r^*')
+colormap jet
+colorbar
+set(gca,'colorscale', 'log', 'xscale', 'log')
+figure;contourf(decayrates.d_BEM, diameter, I_satenhFFsort,1000, 'edgecolor', 'none')
+xlabel('molecule-tip separation d (nm)')
+ylabel('diamter (nm)')
+legend('I_{sat} (W m^{-2})')
+colormap jet
+colorbar
+set(gca,'colorscale', 'log', 'xscale', 'log')
 %% Plot enhanced I_sat and non-enhanced I_sat
 figure
 plot(abs(WL),I_satenh./PCR.I_sat)
