@@ -30,6 +30,7 @@ for i = 3 : length(subFolders)
     WL(i - 2) = 1248/decayrates.Lorentz(3);
     maxFE(i - 2) = max(decayrates.ee'.*decayrates.Q_avg(QY_idx,:)./decayrates.QY(QY_idx));
     FE_location(i - 2) = decayrates.ee(dist_idx).*decayrates.Q_avg(QY_idx,dist_idx)./decayrates.QY(QY_idx); % enhancement factor at surveyed location, 3 nm or 7 nm.
+    NF (i - 2 ) = decayrates.ee(dist_idx); 
     [startIndex,endIndex] = regexp( subFolders(i).name,'H[0-9]+D');
     height(i - 2) = str2num(subFolders(i).name(2:endIndex-1));
      [startIndex,endIndex] = regexp( subFolders(i).name,'D[0-9]\w');
@@ -59,7 +60,7 @@ loglog(x, nonenh_PCR,'-')
 xlabel('Power Wm^{-2}')
 ylabel('Photon count rate')
 lg = split(num2str(round(WL(pcles_id))),'  ');
-lg = split(num2str(round(diameter)),'  ');
+%lg = split(num2str(round(diameter)),'  ');
 for i = 1 : length(lg)
     lg{i} = [lg{i},' nm'];
 end 
@@ -174,8 +175,10 @@ pbaspect([1.2, 1 , 1])
 set(gca,'units','centimeters','position',[3,3,7,5])
 %% Plot enhanced I_sat and non-enhanced I_sat
 figure
-plot(abs(WL),I_satenh./PCR.I_sat)
+plot(abs(WL),I_satenh(:,dist_idx)./PCR.I_sat,abs(WL),I_satenhFF(:,dist_idx)./PCR.I_sat)
 
+figure
+plot(abs(WL),I_satenhFF(:,dist_idx)./PCR.I_sat)
 
 %% Plot QY and SPR dependent PCR
 figure

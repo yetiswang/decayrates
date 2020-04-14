@@ -26,6 +26,7 @@ function [PCR, FE, Lorentz, ee] = FE_GNR_1D( height, diameter, metal, enei_field
     
     
     %  nanorod geometries
+    %mesh = [ 11, 11, 11]; % n1 for the circumference of the rod, n2 for the polar angles of the rod caps, n3 for the cylinder-shaped middle part of the rod
     mesh = [ 41, 41, 41]; % n1 for the circumference of the rod, n2 for the polar angles of the rod caps, n3 for the cylinder-shaped middle part of the rod
     
     QY = [ 0.01 0.02 0.05 0.1 0.2 0.65 1]; % series of QY for calculation
@@ -44,10 +45,11 @@ function [PCR, FE, Lorentz, ee] = FE_GNR_1D( height, diameter, metal, enei_field
     
     
     %% make a new directory
+    
     directory = pwd;
     switch metal
         case 'Au'
-            ndir = ['H',num2str(height),'D',num2str(diameter),'_GNR','_Exc', num2str(enei_field),'_Dip_',num2str(enei_dipole)];
+            ndir = ['H',num2str(height),'D',num2str(diameter),'_GNR'] ;%,'_Exc', num2str(enei_field),'_Dip_',num2str(enei_dipole)];
         case 'AgPalik'
             ndir = ['H',num2str(height),'D',num2str(diameter),'_AgNR_palik','_Exc', num2str(enei_field),'_Dip_',num2str(enei_dipole)];
         case 'AgJC'
@@ -80,7 +82,7 @@ function [PCR, FE, Lorentz, ee] = FE_GNR_1D( height, diameter, metal, enei_field
     %x = reshape( linspace( 0.51, (50 + 0.5 * height )/height, 100 ) * height, [], 1 );
     
     % compoint
-    pt = compoint( p, [ x, 0 .* x, 0 .* x ], 'mindist' , 1e-10  );
+    pt = compoint( p, [ x, 0 .* x, 0 .* x ], 'mindist' , 1 );
     
     dir_dip = [ 1, 0, 0 ; 0 , 1 , 0 ; 0, 0, 1];
     
@@ -108,12 +110,12 @@ function [PCR, FE, Lorentz, ee] = FE_GNR_1D( height, diameter, metal, enei_field
     %  total and radiative decay rate
     [ tot, rad, ~] = dip.decayrate( sig );
     %% decay rate plot for intrinsic quantum yield of 1%. These plots are generated as examples and previews.
-    d_BEM = x - height/2;
+    d_BEM = pt.pos(:,1) - height/2;
     
     figure
-    semilogy( x , tot, '-'  );  hold on;
-    semilogy( x, rad, 'o-' );
-    xlim( [ min( x ), max( x ) ] );
+    semilogy( pt.pos(:,1), tot, '-'  );  hold on;
+    semilogy( pt.pos(:,1), rad, 'o-' );
+    xlim( [ min( pt.pos(:,1) ), max( pt.pos(:,1) ) ] );
     title( 'Total and radiaitve decay rate for dipole oriented along x and z' );
     legend( 'tot_x BEM','tot_y BEM','tot_z BEM','rad_x BEM','rad_y BEM', 'rad_z BEM' )
     
@@ -178,7 +180,7 @@ function [PCR, FE, Lorentz, ee] = FE_GNR_1D( height, diameter, metal, enei_field
     %    MINDIST controls the minimal distance of the field points to the
     %    particle boundary, MESHFIELD must receive the OP structure which also
     %    stores the table of precomputed reflected Green functions
-    emesh = meshfield( p, x, 0 .* x, 0 .* x, op, 'mindist', 0.2, 'nmax', 2000 , 'waibar', 1 );
+    emesh = meshfield( p, pt.pos(:,1), 0 .* pt.pos(:,1), 0 .* pt.pos(:,1), op, 'mindist', 0.2, 'nmax', 2000 , 'waibar', 1 );
     %  induced and incoming electric field
     e = emesh( sig ) + emesh( exc.field( emesh.pt, enei_field ) );
     %  norm of electric field

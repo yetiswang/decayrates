@@ -5,7 +5,7 @@ function [PCR] = PhotonCountRate( decayrates )
     %% Photon counts calculation
     PCR = struct();
     
-    d = 4 ; % choose a fixed location for plotting of power dependent results. The closest points in d_BEM will be chosen according to decay rates results.
+    d = 1 ; % choose a fixed location for plotting of power dependent results. The closest points in d_BEM will be chosen according to decay rates results.
     
     %PCR.AbsorptionCrossSection = 10e-20 ; % m^2
     PCR.AbsorptionCrossSection = 5.7e-20 ; % m^2, ATTO647N 
@@ -36,9 +36,11 @@ function [PCR] = PhotonCountRate( decayrates )
     PCR.I_inc = logspace(0,10,50) ; % incident power density, W m^-2, 1 - 1e10 W m^-2
     
     PCR.ISC_ratio = 300; % k_ISC/k_T. Wenger, Optics Express 2008
+    triplet_enh = 1e4 ; % Use this term for hypothesized triplet decay enhancement. This term is effetively: (k_isc + k_T)/k_r^0.
     
     PCR.I_sat = PCR.h*PCR.nu*PCR.k_tot./(PCR.AbsorptionCrossSection.*(1 + PCR.ISC_ratio))  ;
-    PCR.I_satenh = PCR.h*PCR.nu*PCR.k_r.*decayrates.tot_average./(PCR.AbsorptionCrossSection.*(1 + PCR.ISC_ratio))  ; % distance-dependent term from tot_average, this is a local field term. Far-field values needs to be devided by near field enhancement factor.
+    
+    PCR.I_satenh = PCR.h*PCR.nu*(PCR.k_r.*decayrates.tot_average + PCR.k_r.*triplet_enh )./(PCR.AbsorptionCrossSection.*(1 + PCR.ISC_ratio))  ; % distance-dependent term from tot_average, this is a local field term. Far-field values needs to be devided by near field enhancement factor.
     % Note!
     % Modifed total decay rate is k_tot* = k_r * tot_average. Since tot_average
     % = k_tot*/(k_r)
@@ -150,96 +152,96 @@ function [PCR] = PhotonCountRate( decayrates )
 %     MinWhitSpace
 %     saveas( gcf,'QY dependent PCR max enhancement.fig' )
 %     saveas( gcf,'QY dependent PCR max enhancement.png' )
-%% Plot the quantum yield depedent PCR_max and I_sat modifications. 
-%  This calculation is for showing only, and does not go into the result
-%  array.
-        %phi_0 = logspace( -2, 0, 1000 );
-        phi_0 = linspace(0.001, 1, 1000);
-        k_r = 1.8e8; % intrinsic radiative decay rate. 
-        k_tot = k_r./phi_0; % intrinsic total decay rate.
-    
-    for i = 1 : length(phi_0)
-        
-        phi(i,:) =  decayrates.rad_average./( decayrates.tot_average + (1 - phi_0(i) )./ phi_0(i) ) ;
-              
-        I_sat(i) = PCR.h*PCR.nu*k_tot(i)./(PCR.AbsorptionCrossSection.*(1 + PCR.ISC_ratio))  ;
-        
-        I_satenh(i,:) = PCR.h*PCR.nu*k_r.*decayrates.tot_average./(PCR.AbsorptionCrossSection.*(1 + PCR.ISC_ratio))  ; % distance-dependent term from tot_average, this is a local field term. Far-field values needs to be devided by near field enhancement factor.
-        
-        PCR_max(i,:) = PCR.AbsorptionCrossSection.* PCR.collectionEfficiency./...
-            (PCR.h*PCR.nu).*phi_0(i).*phi(i,:)./phi_0(i).*I_satenh(i,:); % enhanced maximal PCR
-        PCR_maxnonenh(i) = PCR.AbsorptionCrossSection.* PCR.collectionEfficiency./...
-            (PCR.h*PCR.nu).*phi_0(i).* I_sat(i);  % non-enhanced maximal PCR
-    end
-    
-    figure
-    plot(phi_0,PCR_max(:,dist_idx),phi_0,PCR_maxnonenh)
-    set(gca,'FontSize',10)
-    pbaspect([1.2, 1 , 1])
-    %gca.PlotBoxAspectRatio = [1 0.75 0.75];
-    %set(gcf,'units','centimeters','position',[10,10,14,10])
-    set(gca,'units','centimeters','position',[1,1,7,5])
-    
-    figure
-    loglog(phi_0,I_satenh(:,dist_idx), phi_0, I_sat, phi_0, I_satenh(:,dist_idx)./decayrates.ee(dist_idx) )
-    
-    figure;contourf(decayrates.d_BEM, diameter, I_satenhFFsort,1000, 'edgecolor', 'none')
-    xlabel('molecule-tip separation d (nm)')
-    ylabel('\phi_0')
-    legend('I_{sat} (W m^{-2})')
-    colormap jet
-    colorbar
-    set(gca,'colorscale', 'log', 'xscale', 'log')
-    set(gca,'FontSize',10)
-    pbaspect([1.2, 1 , 1])
-    %gca.PlotBoxAspectRatio = [1 0.75 0.75];
-    %set(gcf,'units','centimeters','position',[10,10,14,10])
-    set(gca,'units','centimeters','position',[3,3,7,5])
-    
-    % plot distance and phi_0 dependent phi
-    figure
-    [C,h] = contourf(decayrates.d_BEM,phi_0,phi);
-    xlabel('molecule-tip separation d (nm)')
-    ylabel('\phi_0')
-    %clabel(C,h,'FontSize',12)
-    %h.ShowText = 'on';
-    set(gca,'XScale','log','yscale','log')
-    colorbar
-    caxis([0.001 1])
-    colormap jet
-    
-    figure
-    imagesc(decayrates.d_BEM,phi_0,phi);
-    xlabel('molecule-tip separation d (nm)')
-    ylabel('\phi_0')
-    %clabel(C,h,'FontSize',12)
-    %h.ShowText = 'on';
-    %set(gca,'XScale','log','yscale','log')
-    colorbar
-    caxis([0.001 1])
-    colormap jet
-    
-    % plot distance and phi_0 dpendent PCR_max and I_sat
-    figure
-    [C,h] = contourf(decayrates.d_BEM, phi_0, PCR_max );
-    xlabel('molecule-tip separation d (nm)')
-    ylabel('\phi_0')
-    %clabel(C,h,'FontSize',10)
-    set(gca,'xscale','log','yscale','log','ColorScale','log')
-    %addlistener(h,'MarkedClean',@(a,b)ReFormatText(a))
-    colormap jet
-    colorbar
-    
-    figure
-    [C,h] = contourf(decayrates.d_BEM, phi_0, I_satenh);
-    xlabel('molecule-tip separation d (nm)')
-    ylabel('\phi_0')
-    %clabel(C,h,'FontSize',10)
-    set(gca,'xscale','log','yscale','log','ColorScale','log')
-    %addlistener(h,'MarkedClean',@(a,b)ReFormatText(a))
-
-    colormap jet
-    colorbar
+% %% Plot the quantum yield depedent PCR_max and I_sat modifications. 
+% %  This calculation is for showing only, and does not go into the result
+% %  array.
+%         %phi_0 = logspace( -2, 0, 1000 );
+%         phi_0 = linspace(0.001, 1, 1000);
+%         k_r = 1.8e8; % intrinsic radiative decay rate. 
+%         k_tot = k_r./phi_0; % intrinsic total decay rate.
+%     
+%     for i = 1 : length(phi_0)
+%         
+%         phi(i,:) =  decayrates.rad_average./( decayrates.tot_average + (1 - phi_0(i) )./ phi_0(i) ) ;
+%               
+%         I_sat(i) = PCR.h*PCR.nu*k_tot(i)./(PCR.AbsorptionCrossSection.*(1 + PCR.ISC_ratio))  ;
+%         
+%         I_satenh(i,:) = PCR.h*PCR.nu*k_r.*decayrates.tot_average./(PCR.AbsorptionCrossSection.*(1 + PCR.ISC_ratio))  ; % distance-dependent term from tot_average, this is a local field term. Far-field values needs to be devided by near field enhancement factor.
+%         
+%         PCR_max(i,:) = PCR.AbsorptionCrossSection.* PCR.collectionEfficiency./...
+%             (PCR.h*PCR.nu).*phi_0(i).*phi(i,:)./phi_0(i).*I_satenh(i,:); % enhanced maximal PCR
+%         PCR_maxnonenh(i) = PCR.AbsorptionCrossSection.* PCR.collectionEfficiency./...
+%             (PCR.h*PCR.nu).*phi_0(i).* I_sat(i);  % non-enhanced maximal PCR
+%     end
+%     
+%     figure
+%     plot(phi_0,PCR_max(:,dist_idx),phi_0,PCR_maxnonenh)
+%     set(gca,'FontSize',10)
+%     pbaspect([1.2, 1 , 1])
+%     %gca.PlotBoxAspectRatio = [1 0.75 0.75];
+%     %set(gcf,'units','centimeters','position',[10,10,14,10])
+%     set(gca,'units','centimeters','position',[1,1,7,5])
+%     
+%     figure
+%     loglog(phi_0,I_satenh(:,dist_idx), phi_0, I_sat, phi_0, I_satenh(:,dist_idx)./decayrates.ee(dist_idx) )
+%     
+%     figure;contourf(decayrates.d_BEM, diameter, I_satenhFFsort,1000, 'edgecolor', 'none')
+%     xlabel('molecule-tip separation d (nm)')
+%     ylabel('\phi_0')
+%     legend('I_{sat} (W m^{-2})')
+%     colormap jet
+%     colorbar
+%     set(gca,'colorscale', 'log', 'xscale', 'log')
+%     set(gca,'FontSize',10)
+%     pbaspect([1.2, 1 , 1])
+%     %gca.PlotBoxAspectRatio = [1 0.75 0.75];
+%     %set(gcf,'units','centimeters','position',[10,10,14,10])
+%     set(gca,'units','centimeters','position',[3,3,7,5])
+%     
+%     % plot distance and phi_0 dependent phi
+%     figure
+%     [C,h] = contourf(decayrates.d_BEM,phi_0,phi);
+%     xlabel('molecule-tip separation d (nm)')
+%     ylabel('\phi_0')
+%     %clabel(C,h,'FontSize',12)
+%     %h.ShowText = 'on';
+%     set(gca,'XScale','log','yscale','log')
+%     colorbar
+%     caxis([0.001 1])
+%     colormap jet
+%     
+%     figure
+%     imagesc(decayrates.d_BEM,phi_0,phi);
+%     xlabel('molecule-tip separation d (nm)')
+%     ylabel('\phi_0')
+%     %clabel(C,h,'FontSize',12)
+%     %h.ShowText = 'on';
+%     %set(gca,'XScale','log','yscale','log')
+%     colorbar
+%     caxis([0.001 1])
+%     colormap jet
+%     
+%     % plot distance and phi_0 dpendent PCR_max and I_sat
+%     figure
+%     [C,h] = contourf(decayrates.d_BEM, phi_0, PCR_max );
+%     xlabel('molecule-tip separation d (nm)')
+%     ylabel('\phi_0')
+%     %clabel(C,h,'FontSize',10)
+%     set(gca,'xscale','log','yscale','log','ColorScale','log')
+%     %addlistener(h,'MarkedClean',@(a,b)ReFormatText(a))
+%     colormap jet
+%     colorbar
+%     
+%     figure
+%     [C,h] = contourf(decayrates.d_BEM, phi_0, I_satenh);
+%     xlabel('molecule-tip separation d (nm)')
+%     ylabel('\phi_0')
+%     %clabel(C,h,'FontSize',10)
+%     set(gca,'xscale','log','yscale','log','ColorScale','log')
+%     %addlistener(h,'MarkedClean',@(a,b)ReFormatText(a))
+% 
+%     colormap jet
+%     colorbar
 %% Plot radiative rate dependent PCR_max and I_sat. PCR_max and I_sat strongly depends on the intrinsic radiative rate. 
     
     phi_0 = 0.65; 
@@ -297,6 +299,6 @@ function [PCR] = PhotonCountRate( decayrates )
     save PCR PCR
     
     %clearvars -except enei_field enei_dipole QY
-    %close all
+    close all
     
 end

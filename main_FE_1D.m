@@ -3,17 +3,17 @@ function main_FE_1D
 %height = [  35 40 45 50 55 58 60 62 65 70 73 75 80 83 90];
 %diameter = [ 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30];
 % 
-% height = round([  35 40 45 50 55 58 60 62 65 70 73 75 80 83 90].*2/3);
-% diameter = round([ 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30].*2/3);
+height = round([  35 40 45 50 55 58 60 62 65 70 73 75 80 83 90].*25/30);
+diameter = round([ 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30].*25/30);
 
 %height = round([  35 40 45 50 55 58 60 62 65 70 73 75 80 83 90]./1.2);
 %diameter = round([ 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30]./1.2);
 
-diameter = [ 15 20 25 30 35 40 45 55 60 ];
-height = [  40 52 63 73 82 90 97 109 114 ];
+%diameter = [ 15 20 25 30 35 40 45 55 60 ];
+%height = [  40 52 63 73 82 90 97 109 114 ];
 
-%height = 73; 
-%diameter = 30;
+%height = [73]; 
+%diameter = [30];
 
 
 %height = [  17 20 23 25 27 58 30 32 33 35 37 39 41 43 45];
@@ -51,14 +51,14 @@ for i = 1 : length(metal)
             FE_GNS_1D(diameter(j),metal{i});
             close all
         else
-            [PCR{j},FE{j},Lorentz{j},ee{j}] = FE_GNR_1D(height(j),diameter(j),metal{i},637,664);
+            [PCR{j},FE{j},Lorentz{j},ee{j}] = FE_GNR_1D(height(j),diameter(j),metal{i});%,637,664);
             %FE{j} = FE_GNR_1D(height(j),diameter(j),metal{i});
             close all
         end
-        cd(parent)
-        MaximumPCRenhancement(j,:) = PCR{j}.maximumPCRenhancement;
-        Isat(j) = PCR{j}.I_satenh(10)./ee{j}(10);
-        WL(j) = 1248./Lorentz{j}(3);
+        %cd(parent)
+        %MaximumPCRenhancement(j,:) = PCR{j}.maximumPCRenhancement;
+       % Isat(j) = PCR{j}.I_satenh(10)./ee{j}(10);
+       % WL(j) = 1248./Lorentz{j}(3);
     end
     cd(parent)
 end
