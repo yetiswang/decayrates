@@ -78,11 +78,14 @@ function [PCR, FE, Lorentz, ee] = FE_GNR_1D( height, diameter, metal, enei_field
     %% Dipole positions
         %1D positions of dipole
     %choose the minimum distance by setting the values of x vector
-    x = reshape( logspace( log10(0.51 * height), log10( 100 + 0.5 * height ), 200 ), [], 1 );
-    %x = reshape( linspace( 0.51, (50 + 0.5 * height )/height, 100 ) * height, [], 1 );
+    %x = reshape( logspace( log10(0.51 * height), log10( 100 + 0.5 * height ), 200 ), [], 1 );
+
+    x = reshape( linspace( 0.51, (50 + 0.5 * height )/height, 20 ) * height, [], 1 );
     
     % compoint
-    pt = compoint( p, [ x, 0 .* x, 0 .* x ], 'mindist' , 1 );
+    %pt = compoint( p, [ x, 0 .* x, 0 .* x ], 'mindist' , 1 );
+    
+    pt = compoint( p, [ x,  x, 0 .* x ], 'mindist' , 1 );
     
     dir_dip = [ 1, 0, 0 ; 0 , 1 , 0 ; 0, 0, 1];
     
@@ -204,13 +207,13 @@ function [PCR, FE, Lorentz, ee] = FE_GNR_1D( height, diameter, metal, enei_field
     saveas(gcf, 'nearfield_axis.fig')
     saveas(gcf, 'nearfield_axis.png')
     
-    % % plot electric field vector
-    % figure
-    % coneplot( pt.pos, f.e )
-    % axis on
-    % grid on
-    % hold on;
-    % plot(p)
+    % plot electric field vector
+    figure
+    coneplot( pt.pos, e )
+    axis on
+    grid on
+    hold on;
+    plot(p)
     % saveas( gcf, 'Electric field vector.fig' )
     % saveas( gcf, 'Electric field vector.png' )
     
